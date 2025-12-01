@@ -3,11 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+require("dotenv").config();
 const http = require('http'); // importer http
 const{connectToMongo}=require ('./config/db')
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var indexRouter = require('./routes/indexRouter');
+var usersRouter = require('./routes/usersRouter');
 
 var app = express();
 
@@ -39,7 +39,7 @@ app.use(function (err, req, res, next) {
 });
 
 const server = http.createServer(app); //sna3et serveur
-server.listen(3000, () => {
+server.listen(process.env.port, () => {
   connectToMongo(),
   console.log("app is running on port 3000");
 

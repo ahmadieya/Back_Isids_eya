@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 module.exports.connectToMongo = async () => {
     mongoose.set('strictQuery', false);
-    mongoose.connect('mongodb://localhost:27017/isids')
+    mongoose.connect(process.env.MongoDb_URL)
     .then(
         () => { console.log("connect to db") }
     )
