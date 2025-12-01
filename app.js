@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 const http = require('http'); // importer http
+const{connectToMongo}=require ('./config/db')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -39,6 +40,7 @@ app.use(function (err, req, res, next) {
 
 const server = http.createServer(app); //sna3et serveur
 server.listen(3000, () => {
+  connectToMongo(),
   console.log("app is running on port 3000");
 
 });
