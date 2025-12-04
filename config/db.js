@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-module.exports.connectToMongo = async () => {
+module.exports.connectToMongoDb = async () => {
     mongoose.set('strictQuery', false);
     mongoose.connect(process.env.MongoDb_URL) //lien mtaa base 
     .then(
