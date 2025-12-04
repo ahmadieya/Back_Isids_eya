@@ -5,7 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require("dotenv").config();//les ifos sensible
 const http = require('http'); // importer http
-const{connectToMongo}=require ('./config/db')
+const{connectToMongoDb}=require ('./config/db')
+const session = require("express-session");
 
 var indexRouter = require('./routes/indexRouter');
 var usersRouter = require('./routes/usersRouter');
@@ -23,6 +24,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+//app.use(session({ //sesion tatini enehou user li hal fl wa9t tawa
+  //secret: "net secret ds",
+  //resave: false,
+  //saveUninitialized: true,
+  //cookie:{
+    //secure:{secure: false},
+    //maxAge: 72 *60 *60, // lezem cookie w token w session andhom nfs lwa9t
+  //},
+//}))
 
 
 // catch 404 and forward to error handler
@@ -43,7 +53,7 @@ app.use(function (err, req, res, next) {
 
 const server = http.createServer(app); //sna3et serveur
 server.listen(process.env.port, () => {
-  connectToMongo(),
+  connectToMongoDb(),
   console.log("app is running on port 3000");
 
 });
