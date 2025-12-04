@@ -1,36 +1,58 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+
 const userSchema = new mongoose.Schema({
 
-    Nom: String,
-    Login: String,
-    Mot_de_passe: {
+    Nom: { type: String, required: true },
+    Login: { type: String, required: true , unique: true, match:[/^\S+@\S+\.\S+$/ , "Vérifier votre email"]},
+    Password: {
         type: String, required: true, minLength: 8, match: [
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            "le mot de passe doit contenir au moins 8 caractéres, une lettre majuscule , une lettre minuscule , un chiffre"
+            "le mot de passe doit contenir au moins 8 caractéres, une lettre majuscule , une lettre minuscule et un chiffre"
 
         ]
     },
     role: { type: String, enum: ["User", "Manager"] },
+    createdAt: { type: Date, default: Date.now }
 
 },
     { timestamps: true }
 
 );
-userSchema.pre("save", async function( next){//.pre 9bal me save data
-    try{                                     // salt parametre namel biha hachage
-        const salt = await bcrypt.genSalt();// hatit mode async ala khater hedhi bch taatelni hatitlha awail
-        const user = this ;                  //securite estamelt hachage sens unique w jwt 
-        user.password = await bcrypt.hash(user.password , salt)
-     next();
-    }catch(error){
-     next(error);
-    }
-})
-userSchema.post("save" , async function (req , res , next) { //.post baed ma tsave data
-    console.log("nouveau utilisateur a été ajouté avec succès");
-    next();//taada li baadou lezem n9olou bch ye9fch 
-})
+userSchema.statics.login= async function (Login,Password) {
+ 
+           const user=await this.findOne({Login});
+           if (user) {
+            const auth = await bcrypt.compare( Password,user.Password);// trajaa true wela false
+            if (auth){
+                return user;
+            }else {
+                throw new Error ("Mot de passe invalide");
+
+            }
+           }else {
+            throw new Error ("Vérifier votre email")
+           }
+    
+        };
+
+       
+      userSchema.statics.register = async function (Nom , Login, Password) {
+ 
+  const existUser = await this.findOne({ Login });
+  if (existUser) {
+    throw new Error("Ce login existe déjà.");
+  }
+
+  const salt = await bcrypt.genSalt();
+  const hashedPassword = await bcrypt.hash(Password, salt);
+
+ 
+  const user = await this.create({Nom,Login, Password: hashedPassword
+  });
+
+  return user;
+};
 
 const user = mongoose.model("user", userSchema);
 module.exports= user;
