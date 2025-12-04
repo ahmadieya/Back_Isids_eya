@@ -57,3 +57,9 @@ module.exports.login = async(req,res)=>{ //lena yetsna3 token w yetsajel fel coo
   }catch(error){  res.status(500).json({message: error.message})}
 };
 
+module.exports.getAllUsers = async(req , res ) => {
+    try {
+      const userliste = await userModel.find()
+      res.status(200).json ({userliste});
+  } catch (error){ res.status(500).json ({message: error.message});
+}}

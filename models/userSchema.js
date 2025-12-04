@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema({
         ]
     },
     role: { type: String, enum: ["User", "Manager"] },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    Project: { type: mongoose.Schema.Types.ObjectId, ref: 'project' }
 
 },
     { timestamps: true }
@@ -37,7 +38,7 @@ userSchema.statics.login= async function (Login,Password) {
         };
 
        
-      userSchema.statics.register = async function (Nom , Login, Password) {
+      userSchema.statics.register = async function (Nom , Login, Password ) {
  
   const existUser = await this.findOne({ Login });
   if (existUser) {
@@ -46,9 +47,9 @@ userSchema.statics.login= async function (Login,Password) {
 
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(Password, salt);
-
+  const roleUser = 'User';
  
-  const user = await this.create({Nom,Login, Password: hashedPassword
+  const user = await this.create({Nom,Login, Password: hashedPassword,role: roleUser
   });
 
   return user;
