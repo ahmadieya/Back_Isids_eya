@@ -6,11 +6,12 @@ var logger = require('morgan');
 require("dotenv").config();//les ifos sensible
 const http = require('http'); // importer http
 const{connectToMongoDb}=require ('./config/db')
-const session = require("express-session");
+//const session = require("express-session");
 
-var indexRouter = require('./routes/indexRouter');
+
 var usersRouter = require('./routes/usersRouter');
-
+var projectRouter = require('./routes/projectRouter');
+var tasksRouter = require('./routes/tasksRouter');
 
 var app = express();
 
@@ -22,15 +23,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+
 app.use('/users', usersRouter);
+app.use('/project', projectRouter);
+app.use('/tasks', tasksRouter);
+
 //app.use(session({ //sesion tatini enehou user li hal fl wa9t tawa
   //secret: "net secret ds",
-  //resave: false,
-  //saveUninitialized: true,
-  //cookie:{
-    //secure:{secure: false},
-    //maxAge: 72 *60 *60, // lezem cookie w token w session andhom nfs lwa9t
+// resave: false,
+// saveUninitialized: true,
+ //cookie:{
+   // secure:{secure: false},
+   //maxAge: 72 *60 *60, // lezem cookie w token w session andhom nfs lwa9t
   //},
 //}))
 
