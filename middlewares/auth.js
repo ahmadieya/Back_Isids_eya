@@ -1,27 +1,36 @@
-const jwt = require("jsonwebtoken");
+//middelwares fct intermidiaire verifier le token  est ce que luser andou lha9 bch yamel lapi/route heka wela le
+// ki namel login yasna3 token tetsajel fel cokkies ki namel logout to9tel wela tfasakh cokkies
+
+const jwt = require("jsonwebtoken");//pour creer token
 const userModel = require("../models/userSchema");
 
 
-const requireAuthUser = (req, res, next) => {
-    const token = req.cookies.jwt_token;
-    console.log("token", token);
+module.exports.requireAuthUser = async (req, res, next) => {
+    try {
+        const token = req.cookies.jwt_token;
 
-    if (token) {
-        jwt.verify(token, 'net secret ds', async (err, decodedToken) => {
-            if (err) {
-                console.log("erreur au niveau de token", err.message);
-                req.session.user = null;//err fi token donsc user mandich
+        if (!token) {
+            return res.status(400).json({ message: "Token manquant" }); // err f token yani famech login
+        }
+        const decoded = jwt.verify(token, "net secret ds");
+        const user = await userModel.findById(decoded.id); //ki yabda andi yatini user authentifier
+        if (!user) {
+            return res.status(400).json({ message: "Utilisateur introuvable" });// famech user 
+        }
+        req.user = user;
 
-                res.json("/Problem_Token");
-            } else {
-                req.session.user = await userModel.findById(decodedToken._id);//ki yabda andi yatini user authentifier
-               // req.session.user = user;
-                 next();
-            }
-        });
-    } else {
-        req.session.user = null;
-        res.json("/pas_de_token")
+        next();
+    } catch (error) {
+        console.log("Erreur Auth :", error.message);
+        return res.status(400).json({ message: "Token invalide" });
     }
 };
-module.exports = { requireAuthUser };
+module.exports.requireManager = async (req, res, next) => {
+  await module.exports.requireAuth(req, res, async () => {
+    if (req.user.role !== "manager") {// ken role mouch manager manodkhelch lel route
+      return res.status(400).json({ message: "Accès refusé : manager uniquement" });
+    }
+    next();
+  });
+};
+
